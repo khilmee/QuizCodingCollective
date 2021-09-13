@@ -1,4 +1,5 @@
-﻿using QuizCodingCollective.ViewModels;
+﻿using PetaPoco;
+using QuizCodingCollective.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,18 +29,16 @@ namespace QuizCodingCollective.Controllers
                 if (Request.QueryString["format"] != null && Request.QueryString["format"].ToString().ToUpper() == "JSON")
                 {
                     string filter = " WHERE 1=1 ";
-                    string filteradmin = " WHERE 1=1 ";
                     if (search != null && search != "")
                     {
                         filter += string.Format(" AND Name like '%{0}%' OR JobTitle like '%{0}%' OR Salary like '%{0}%'", search);
-                        filteradmin += string.Format("  WHERE (Name LIKE '%{0}%' OR Agenda like '%{0}%' OR Agenda like '%{0}%') ", search);
                     }
 
                     string sort = "";
                     if (sEcho == "1")
                     {
                         //pertama kali load sEcho=1
-                        sort = " order by createddate desc";
+                        sort = " order by name desc";
                     }
                     else
                     {
@@ -50,56 +49,19 @@ namespace QuizCodingCollective.Controllers
                     int totalrecords = 0;
                     int totaldisplayrecords = 0;
 
-                    Database DB = new Database("VMS");
-                    var records = new List<SecurityViewModel>();
+                    Database DB = new Database("Quiz");
+                    var records = new List<EmployeeViewModel>();
 
-                    if (CommonFacade.GetCurrentLoginInfoSession().Role == "SECURITY")
-                    {
-                        filter += " AND IsCheckIn = 1 AND CONVERT(VARCHAR(10), VisitingDate, 111) = CONVERT(VARCHAR(10), GETDATE(), 111)  ";
-                        totalrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM vwSecurity " + filter);
-                        totaldisplayrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM vwSecurity" + filter);
+                    totalrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM Employee " + filter);
+                    totaldisplayrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM Employee" + filter);
 
-                        // Query select untuk menampilkan visitor yang checkin pada hari ini dengan detail asset yang dibawa
-                        // Detail Asset
-
-                        records = DB.Fetch<SecurityViewModel>(pagestart + 1, length, "SELECT * FROM vwSecurity " + filter + sort);
-
-                    }
-                    else
-                    {
-                        totalrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM vwSecurity " + filteradmin);
-                        totaldisplayrecords = DB.ExecuteScalar<int>("SELECT COUNT(*) FROM vwSecurity" + filteradmin);
-
-                        // Query select untuk menampilkan visitor yang checkin pada hari ini dengan detail asset yang dibawa
-                        // Detail Asset
-
-                        records = DB.Fetch<SecurityViewModel>(pagestart + 1, length, "SELECT * FROM vwSecurity " + filteradmin + sort);
-
-                    }
-                    //var records = DB.Fetch<SecurityViewModel>(pagestart + 1, length, "SELECT * FROM VisitingRequest " + filter + sort);
+                    records = DB.Fetch<EmployeeViewModel>(pagestart + 1, length, "SELECT * FROM Employee " + filter + sort);
 
                     List<string[]> listResult = new List<string[]>();
 
                     foreach (var data in records)
                     {
-                        string buttonhtml = "";
-                        var aset = DB.Fetch<dynamic>("Select * From vwVisitorAsset Where VisitorAccountNumber = '" + data.VisitorAccountNumber + "'");
-                        var assetHtml = "<button jsondata='" + JsonConvert.SerializeObject(aset) + "' class='btn btn-info btn-block btn-border btn-detail-user' style='width: 110;' type='submit' data-toggle='modal' data-target='modal-detail'>View Asset</button>";
-
-                        var IsChecked = DB.FirstOrDefault<AssetSecurity>("select * from AssetSecurity where VisitingID =@0 AND VisitorAccountNumber=@1 AND CreatedBy=@2", data.ID, data.VisitorAccountNumber, CommonFacade.GetCurrentLoginInfoSession().Name);
-
-                        if (IsChecked != null)
-                        {
-                            buttonhtml = "<div class='waiting-approval'>Check Out</div>";
-                        }
-                        else
-                        {
-                            buttonhtml = "<button class='btn btn-success btn-block btn-match' jsondata='" + JsonConvert.SerializeObject(data) + "' style='width: 110px;'>Match</button>" +
-                                "<button class='btn btn-danger btn-block btn-not-match' jsondata='" + JsonConvert.SerializeObject(data) + "' style='width: 110px;'>Not Match</button>";
-
-                        }
-
-                        listResult.Add(new string[] { data.ID.ToString(), data.Name.ToString(), data.VisitingDate == null ? "" : ((DateTime)data.VisitingDate).ToString("dd-MM-yyyy"), data.Agenda.ToString(), data.MeetingWith.ToString(), assetHtml, buttonhtml, JsonConvert.SerializeObject(data) });
+                        listResult.Add(new string[] { data.Name.ToString(), data.JobTitle.ToString(), data.Salary.ToString() });
                     }
 
                     return Json(new

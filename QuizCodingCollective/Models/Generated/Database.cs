@@ -175,5 +175,45 @@ namespace Quiz
 
 	}
 
+    
+
+	[TableName("dbo.Employee")]
+
+
+
+	[PrimaryKey("Id", AutoIncrement=false)]
+
+
+	[ExplicitColumns]
+
+    public partial class Employee : QuizDB.Record<Employee>  
+    {
+
+
+
+		[Column] public int Id { get; set; }
+
+
+
+
+
+		[Column] public string Name { get; set; }
+
+
+
+
+
+		[Column] public string JobTitle { get; set; }
+
+
+
+
+
+		[Column] public decimal Salary { get; set; }
+
+
+
+	}
+
 
 }

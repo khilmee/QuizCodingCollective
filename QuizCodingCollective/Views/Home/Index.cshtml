@@ -3,7 +3,7 @@
 }
 
 <!-- Main content -->
-<section class="content">
+<section class="content mt-15">
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-solid">
@@ -37,7 +37,7 @@
 <!-- /.content -->
 <script>
     $(document).ready(function () {
-        var tables = $('#datatable').DataTable({
+        $('#datatable').DataTable({
             "scrollX": true,
             "scrollY": "260px",
             "oLanguage": { "sProcessing": "loading.." },
@@ -45,101 +45,8 @@
             "scrollCollapse": true,
             "searching": true,
             "bServerSide": true,
-            "sAjaxSource": "/securitymanagement?format=json",
-            "bProcessing": true,
-            "drawCallback": function (settings, json) {
-                $('.btn-detail-user').click(function (e) {
-                    var jsondata = JSON.parse($(this).attr('jsondata'));
-                    var detail = $('#aset-table');
-                    detail.empty();
-
-                    for (var i = 0; i < jsondata.length; i++) {
-                        detail.append('<tr> <td>' + jsondata[i].JenisAsset + '</td> <td>' + jsondata[i].NamaAsset + '</td> <td>' + jsondata[i].SerialNumber +
-                            '</td> <td>' + jsondata[i].Description + '</td> <td>' +
-                            '<img class="img-responsive center-block" style="text-align:center;" id="image-asset" width="200" height="200" ' +
-                            'src="/assetmanagement/image?userid=' + jsondata[i].ID + '&imagetype=ASSET" >' +
-                            '</td> </tr>');
-                    };
-                    $('#modal-new').modal('show');
-                });
-
-                $('.btn-match').off('click');
-                $('.btn-match').click(function (e) {
-                    var jsondata = JSON.parse($(this).attr('jsondata'));
-                    $.ajax({
-                        method: 'POST',
-                        data: {
-                            VisitingID: jsondata.ID,
-                            VisitorAccountNumber: jsondata.VisitorAccountNumber,
-                            Status: "MATCH",
-                            Keterangan: "MATCH"
-                        },
-                        url: "/securitymanagement/CheckMatch",
-                        beforeSend: function (xhr) {
-                        },
-                        success: function (response) {
-                            console.log(response);
-                            if (response.result == "ERROR") {
-                                var msg = "";
-                                swal.fire({
-                                    title: "Check Out Gagal",
-                                    type: "error"
-                                })
-                            } else {
-                                swal.fire({
-                                    title: "Check Out Berhasil",
-                                    type: "success"
-                                })
-                                tables.ajax.reload(null, false);
-                            }
-                        }
-                    });
-                });
-
-                $('.btn-not-match').click(function (e) {
-                    var jsondata = JSON.parse($(this).attr('jsondata'));
-                    $('.btn-approve').attr('visitingid', jsondata.ID);
-                    $('.btn-approve').attr('visitorid', jsondata.VisitorAccountNumber);
-                    $('#modal-checkout').modal('show');
-                });
-
-                $('.btn-approve').click(function () {
-                    var visitingID = $('.btn-approve').attr('visitingid');
-                    var visitorID = $('.btn-approve').attr('visitorid');
-                    var description = $('textarea[name=description]').val();
-                    $.ajax({
-                        method: 'POST',
-                        data: {
-                            VisitingID: visitingID,
-                            VisitorAccountNumber: visitorID,
-                            Status: "NOTMATCH",
-                            Keterangan: description
-                        },
-                        url: "/securitymanagement/CheckMatch",
-                        beforeSend: function (xhr) {
-                        },
-                        success: function (response) {
-                            console.log(response);
-                            if (response.result == "ERROR") {
-                                var msg = response.errorMsg;
-                                swal.fire({
-                                    title: "Check Out Gagal",
-                                    text: msg,
-                                    type: "error"
-                                })
-                            } else {
-                                swal.fire({
-                                    title: "Check Out Berhasil", type: "success"
-                                }).then(function () {
-                                    $('#modal-checkout').modal('hide');
-                                    $('textarea').val('');
-                                    tables.ajax.reload(null, false);
-                                });
-                            }
-                        }
-                    });
-                });
-            }
+            "sAjaxSource": "/home?format=json",
+            "bProcessing": true
         });
     });
 </script>
