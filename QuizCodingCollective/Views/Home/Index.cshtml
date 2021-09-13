@@ -2,30 +2,144 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <!--Table-->
+                    <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="datatable" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="datatable_info" width="100%">
+                                    <thead>
+                                        <tr role="row">
+                                            <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Name</th>
+                                            <th class="sorting hide-colrow" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Job Title</th>
+                                            <th class="sorting hide-colrow" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Salary</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--Content Table-->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End Table -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+<script>
+    $(document).ready(function () {
+        var tables = $('#datatable').DataTable({
+            "scrollX": true,
+            "scrollY": "260px",
+            "oLanguage": { "sProcessing": "loading.." },
+            "sProcessing": true,
+            "scrollCollapse": true,
+            "searching": true,
+            "bServerSide": true,
+            "sAjaxSource": "/securitymanagement?format=json",
+            "bProcessing": true,
+            "drawCallback": function (settings, json) {
+                $('.btn-detail-user').click(function (e) {
+                    var jsondata = JSON.parse($(this).attr('jsondata'));
+                    var detail = $('#aset-table');
+                    detail.empty();
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+                    for (var i = 0; i < jsondata.length; i++) {
+                        detail.append('<tr> <td>' + jsondata[i].JenisAsset + '</td> <td>' + jsondata[i].NamaAsset + '</td> <td>' + jsondata[i].SerialNumber +
+                            '</td> <td>' + jsondata[i].Description + '</td> <td>' +
+                            '<img class="img-responsive center-block" style="text-align:center;" id="image-asset" width="200" height="200" ' +
+                            'src="/assetmanagement/image?userid=' + jsondata[i].ID + '&imagetype=ASSET" >' +
+                            '</td> </tr>');
+                    };
+                    $('#modal-new').modal('show');
+                });
+
+                $('.btn-match').off('click');
+                $('.btn-match').click(function (e) {
+                    var jsondata = JSON.parse($(this).attr('jsondata'));
+                    $.ajax({
+                        method: 'POST',
+                        data: {
+                            VisitingID: jsondata.ID,
+                            VisitorAccountNumber: jsondata.VisitorAccountNumber,
+                            Status: "MATCH",
+                            Keterangan: "MATCH"
+                        },
+                        url: "/securitymanagement/CheckMatch",
+                        beforeSend: function (xhr) {
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            if (response.result == "ERROR") {
+                                var msg = "";
+                                swal.fire({
+                                    title: "Check Out Gagal",
+                                    type: "error"
+                                })
+                            } else {
+                                swal.fire({
+                                    title: "Check Out Berhasil",
+                                    type: "success"
+                                })
+                                tables.ajax.reload(null, false);
+                            }
+                        }
+                    });
+                });
+
+                $('.btn-not-match').click(function (e) {
+                    var jsondata = JSON.parse($(this).attr('jsondata'));
+                    $('.btn-approve').attr('visitingid', jsondata.ID);
+                    $('.btn-approve').attr('visitorid', jsondata.VisitorAccountNumber);
+                    $('#modal-checkout').modal('show');
+                });
+
+                $('.btn-approve').click(function () {
+                    var visitingID = $('.btn-approve').attr('visitingid');
+                    var visitorID = $('.btn-approve').attr('visitorid');
+                    var description = $('textarea[name=description]').val();
+                    $.ajax({
+                        method: 'POST',
+                        data: {
+                            VisitingID: visitingID,
+                            VisitorAccountNumber: visitorID,
+                            Status: "NOTMATCH",
+                            Keterangan: description
+                        },
+                        url: "/securitymanagement/CheckMatch",
+                        beforeSend: function (xhr) {
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            if (response.result == "ERROR") {
+                                var msg = response.errorMsg;
+                                swal.fire({
+                                    title: "Check Out Gagal",
+                                    text: msg,
+                                    type: "error"
+                                })
+                            } else {
+                                swal.fire({
+                                    title: "Check Out Berhasil", type: "success"
+                                }).then(function () {
+                                    $('#modal-checkout').modal('hide');
+                                    $('textarea').val('');
+                                    tables.ajax.reload(null, false);
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>

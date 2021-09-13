@@ -1,0 +1,187 @@
+﻿@model QuizCodingCollective.ViewModels.RegisterViewModel
+@{
+    ViewBag.Title = "register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Registration Page</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="~/Content/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/Content/Assets/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="~/Content/Assets/plugins/iCheck/square/blue.css">
+    <link rel="stylesheet" href="~/Content/Assets/dist/css/style-wizard.css">
+    <link href="~/Content/sweetallert/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/select2/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+
+<body class="hold-transition register-page">
+    <div class="background"></div>
+    <div class="register-box">
+        <div class="register-box-body">
+            <form role="form" action="/account/register" method="post" enctype="multipart/form-data" class="f1">
+                <div class="row">
+                    <div class="col-md-12">
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group has-feedback">
+                            <label class="register-label registerLabel-mb0">Username *</label>
+                            <input type="text" id="username" class="form-control" placeholder="e.g. Username" name="username">
+                            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <label class="register-label registerLabel-mb0">Password (*)</label>
+                            <input id="psw" type="password" class="form-control" placeholder="Must have at least 8 character" name="password">
+                            <span class="glyphicon glyphicon-eye-close form-control-feedback"></span>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div id="message" style="display:none">
+                                <h6>Password must contain the following:</h6>
+                                <h6 id="letter" class="text-danger">A lowercase letter</h6>
+                                <h6 id="capital" class="text-danger">A capital(uppercase) letter</h6>
+                                <h6 id="number" class="text-danger">A number</h6>
+                                <h6 id="length" class="text-danger">Minimum 8 character</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group has-feedback">
+                            <label class="register-label registerLabel-mb0">Re-type Password (*)</label>
+                            <input id="confirmpassword" type="password" class="form-control" placeholder="Must have at least 8 character" name="confirmpassword">
+                            <span class="glyphicon glyphicon-eye-close form-control-feedback"></span>
+                            <span id="psw-danger" class="text-danger" hidden>password not match</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <button id="submit-data" type="button" class="btn btn-primary btn-block btn-flat">SUBMIT <i class="fa fa-arrow-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/Content/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="~/Content/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/Content/webcamjs/webcam.min.js"></script>
+    <script src="~/Content/sweetallert/sweetalert2.min.js"></script>
+    <script src="~/Content/Assets/dist/js/jquery.backstretch.min.js"></script>
+    <script src="~/Content/Assets/dist/js/scripts.js"></script>
+    <script src="~/Content/select2/js/select2.full.min.js"></script>
+    <script>
+        function checkPasswordMatch() {
+            var password = $("#psw").val();
+            var confirmPassword = $("#confirm-password").val();
+            if (password != confirmPassword) {
+                $('#psw-confirm').addClass('input-error');
+                $('#psw-danger').show();
+                $('#fullname').prop("disabled", true);
+                $('#email').prop("disabled", true);
+                $('#phone').prop("disabled", true);
+                $('#cardid').prop("disabled", true);
+                $("#company").attr('disabled', 'disabled')
+                $("#cardtype").attr('disabled', 'disabled')
+            } else {
+                $('#psw-confirm').removeClass('input-error');
+                $('#psw-danger').hide();
+                $('#fullname').prop("disabled", false);
+                $('#email').prop("disabled", false);
+                $('#phone').prop("disabled", false);
+                $('#cardid').prop("disabled", false);
+                $('#company').removeAttr('disabled');
+                $('#cardtype').removeAttr('disabled');
+            }
+        }
+        var myInput = document.getElementById("psw");
+        var letter = document.getElementById("letter");
+        var capital = document.getElementById("capital");
+        var number = document.getElementById("number");
+        var length = document.getElementById("length");
+
+        myInput.onfocus = function () {
+            document.getElementById("message").style.display = "block";
+        }
+
+        myInput.onblur = function () {
+            document.getElementById("message").style.display = "none";
+        }
+
+        myInput.onkeyup = function () {
+            var lowerCaseLetters = /[a-z]/g;
+            if (myInput.value.match(lowerCaseLetters)) {
+                letter.classList.remove("text-danger");
+                letter.classList.add("text-green");
+            } else {
+                letter.classList.remove("text-green");
+                letter.classList.add("text-danger");
+            }
+            var upperCaseLetters = /[A-Z]/g;
+            if (myInput.value.match(upperCaseLetters)) {
+                capital.classList.remove("text-danger");
+                capital.classList.add("text-green");
+            } else {
+                capital.classList.remove("text-green");
+                capital.classList.add("text-danger");
+            }
+            var numbers = /[0-9]/g;
+            if (myInput.value.match(numbers)) {
+                number.classList.remove("text-danger");
+                number.classList.add("text-green");
+            } else {
+                number.classList.remove("text-green");
+                number.classList.add("text-danger");
+            }
+            if (myInput.value.length >= 8) {
+                length.classList.remove("text-danger");
+                length.classList.add("text-green");
+            } else {
+                length.classList.remove("text-green");
+                length.classList.add("text-danger");
+            }
+        }
+    
+        function forceKeyPressUppercase(e) {
+            var charInput = e.keyCode;
+            if ((charInput >= 97) && (charInput <= 122)) {
+                if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+                    var newChar = charInput - 32;
+                    var start = e.target.selectionStart;
+                    var end = e.target.selectionEnd;
+                    e.target.value = e.target.value.substring(0, start) + String.fromCharCode(newChar) + e.target.value.substring(end);
+                    e.target.setSelectionRange(start + 1, start + 1);
+                    e.preventDefault();
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            $("#fullname").keypress(function (e) {
+                if (String.fromCharCode(e.which).match(/[^a-zA-Z/\W\x08]/)) {
+
+                    e.preventDefault();
+                }
+            });
+            $("#phone").keypress(function (e) {
+                if (String.fromCharCode(e.which).match(/[^0-9\x08]/)) {
+                    e.preventDefault();
+                }
+            });
+            $("#psw-confirm").keyup(checkPasswordMatch);
+
+            $('#submit-data').on('click', function () {
+                $('.f1').submit();
+            });
+        });
+    </script>
+</body>
+
+</html>
+

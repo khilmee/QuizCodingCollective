@@ -1,0 +1,65 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "Login";
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="stylesheet" href="~/Content/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="~/Content/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="~/Content/Assets/bower_components/Ionicons/css/ionicons.min.css">
+        <link rel="stylesheet" href="~/Content/Assets/dist/css/AdminLTE.min.css">
+        <link rel="stylesheet" href="~/Content/Assets/plugins/iCheck/square/blue.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    </head>
+
+    <body class="hold-transition login-page">
+        <div class="background"></div>
+        <div class="login-box">
+            <div class="login-box-body">
+                <h4 class="login-box-msg" style="color:black;">Login Form</h4>
+                <p class="login-box-msg">Sign in to start your session</p>
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <form action="/account/login" method="post">
+                    <div class="form-group has-feedback login-mb25">
+                        <label class="login-label" for="username">Username</label>
+                        <input type="text" class="form-control" placeholder="e.g username" name="username">
+                        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="login-label" for="password">Password</label>
+                        <input type="password" class="form-control" placeholder="**********" name="password">
+                        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                        <div class="col-xs-6 padding0" style="margin-top: 10px;">
+
+                        </div>
+                    </div>
+                    <div align="center" class="login-mt55">
+                        <button style="width: 100%;" type="submit" class="btn btn-primary btn-block btn-flat">SIGN IN <i class="fa fa-arrow-circle-right"></i></button>
+                    </div>
+                </form>
+            </div>
+            <div class="register-btn-wrapper col-lg-12" style="margin-top:-10px;">
+                <div class="col-xs-6 padding0" style="text-align: right; margin-top:-29px">
+                    <div class="checkbox icheck">
+                        <label>
+                            Do not have an account?
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-6 padding0" style="text-align: left; margin-top:0px">
+                    <div class="checkbox icheck">
+                        <a href="/account/register">Register Here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="~/Content/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="~/Content/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    </body>
+</html>
