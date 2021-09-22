@@ -213,6 +213,12 @@ namespace Quiz
 
 
 
+
+
+		[Column] public string Currency { get; set; }
+
+
+
 	}
 
 

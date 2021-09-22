@@ -16,7 +16,7 @@ namespace QuizCodingCollective.Controllers
             {
                 ViewBag.PageTitle = "Employee Data";
                 ViewBag.logininfo = Session["currentuser"] as LoginInfoSession;
-                string[] DisplayColumns = new string[] { "Name", "JobTitle", "Salary" };
+                string[] DisplayColumns = new string[] { "Name", "JobTitle", "Currency", "Salary" };
                 long draw = Convert.ToInt64(Request.QueryString["draw"]);
                 long start = Convert.ToInt64(Request.QueryString["iDisplayStart"]);
                 long length = Convert.ToInt64(Request.QueryString["iDisplayLength"]);
@@ -31,7 +31,7 @@ namespace QuizCodingCollective.Controllers
                     string filter = " WHERE 1=1 ";
                     if (search != null && search != "")
                     {
-                        filter += string.Format(" AND Name like '%{0}%' OR JobTitle like '%{0}%' OR Salary like '%{0}%'", search);
+                        filter += string.Format(" AND Name like '%{0}%' OR JobTitle like '%{0}%' OR Currency like '%{0}%' OR Salary like '%{0}%'", search);
                     }
 
                     string sort = "";
@@ -61,7 +61,7 @@ namespace QuizCodingCollective.Controllers
 
                     foreach (var data in records)
                     {
-                        listResult.Add(new string[] { data.Name.ToString(), data.JobTitle.ToString(), data.Salary.ToString() });
+                        listResult.Add(new string[] { data.Name.ToString(), data.JobTitle.ToString(), data.Currency.ToString(), data.Salary.ToString() });
                     }
 
                     return Json(new
